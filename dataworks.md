@@ -327,3 +327,11 @@ Return with failed!!
 
 ![tool-manager](assets/数据同步子查询1.png)
 
+### 3.Q：如何控制只能从内网环境访问DataWorks控制台？
+
+#### A:如果您希望您所在企业的用户只能通过企业内网访问DataWorks控制台，可以通过在RAM控制台中设置，仅放通您所在企业的内网地址映射出的公网地址实现，如下图所示。
+
+![tool-manager](assets/访问.png)
+
+
+
