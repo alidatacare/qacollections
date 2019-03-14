@@ -370,7 +370,7 @@ Return with failed!!
 ### 7.Q：dataworks从旧版本升级到2.0，有没有比较好的作业迁移方案将旧的工作流升级为2.0里面的业务流程？
 
 #### 7A：通过工作流的移动或者跨项目的克隆可以实现
-![tool-manager](assets/工作流移动.jpg）
+![tool-manager](assets/工作流移动.jpg)
 ![tool-manager](assets/跨项目克隆.jpg)
 ![tool-manager](assets/跨项目克隆动图.gif)
 跨项目克隆，相关的原理可以查看文档：https://help.aliyun.com/document_detail/92403.html?spm=a2c4g.11186623.6.655.55fe3467pKD6kF
