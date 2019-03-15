@@ -369,8 +369,72 @@ Return with failed!!
 ![tool-manager](assets/批量上云3.png)
 ### 7.Q：dataworks从旧版本升级到2.0，有没有比较好的作业迁移方案将旧的工作流升级为2.0里面的业务流程？
 
-#### 7A：通过工作流的移动或者跨项目的克隆可以实现
+#### A：通过工作流的移动或者跨项目的克隆可以实现
 ![tool-manager](assets/工作流移动.jpg)
 ![tool-manager](assets/跨项目克隆.jpg)
 ![tool-manager](assets/跨项目克隆动图.gif)
 跨项目克隆，相关的原理可以查看文档：https://help.aliyun.com/document_detail/92403.html?spm=a2c4g.11186623.6.655.55fe3467pKD6kF
+
+###8.政务云同步任务脚本配置范例
+
+```
+{
+    "configuration": {
+        "reader": {
+            "plugin": "odps",
+            "parameter": {
+                "datasource": "odps_first",
+                "table": "qcgw_flowdetr_ipmont_cyrslt",
+                "column": [
+                    "crossid",
+                    "crossname",
+                    "locationtype",
+                    "code",
+                    "ip",
+                    "whsj",
+                    "old_new"
+                ]
+            }
+        },
+        "writer": {
+            "plugin": "mysql",
+            "parameter": {
+                "datasource": "aduaque02",
+                "table": "qcgw_flowdetr_ipmont_cyrslt",
+
+                "column": [
+                    "crossid",
+                    "crossname",
+                    "locationtype",
+                    "code",
+                    "ip",
+                    "whsj",
+                    "old_new"
+                ],
+                "postSql": [
+                    "UPDATE qcgw_flowdetr_ipmont_ysj qfiy SET qfiy.end_date = CURRENT_TIMESTAMP (),qfiy.is_effect = 0 WHERE(qfiy.crossid,qfiy.crossname,qfiy.locationtype,qfiy.code,qfiy.ip) IN (SELECT qfic.crossid,qfic.crossname,qfic.locationtype,qfic.code,qfic.ip FROM qcgw_flowdetr_ipmont_cyrslt qfic WHERE qfic.old_new = 0);",
+                    "INSERT INTO qcgw_flowdetr_ipmont_ysj (crossid,crossname,locationtype,code,ip) SELECT qfic.crossid,qfic.crossname,qfic.locationtype,qfic.code,qfic.ip FROM qcgw_flowdetr_ipmont_cyrslt qfic WHERE qfic.old_new = 1;",
+                    "truncate table qcgw_flowdetr_ipmont;",
+                    "INSERT INTO qcgw_flowdetr_ipmont (crossid,crossname,locationtype,code,ip,whsj) SELECT qfiy.crossid,qfiy.crossname,qfiy.locationtype,qfiy.code,qfiy.ip,qfiy.begin_date FROM qcgw_flowdetr_ipmont_ysj qfiy WHERE qfiy.is_effect = 1;",
+                    "UPDATE qcgw_flowdetr_ipmont qfi SET qfi.is_clean = 1 WHERE qfi.crossid = 9999 OR qfi.crossname = '9999' OR qfi.locationtype = '9999' OR qfi.code = '9999' OR qfi.ip = '9999';"
+                ],
+                "truncate": false
+            }
+        },
+        "setting": {
+            "speed": {
+                "mbps": 1
+            },
+            "errorLimit": {}
+        }
+    },
+    "type": "job", 
+    "version": "1.0"
+}
+```
+###9.政务云生产环境和测试环境完全隔离
+数据源，模型都需要重新创建 任务则需要提交到审批队列 经审批通过后 才能上线即到生产环境。
+
+###10.联合主键和无主键表的数据同步，切分字段怎么处理？
+答：切分字段可以是表中任意字段，目的是为了使并发传送的包切分起来数据量分布均匀，减少长尾效应。
+
