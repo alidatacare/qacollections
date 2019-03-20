@@ -58,3 +58,21 @@
 ##### A:灰色代表这个账号没有配置有效邮箱，该灰色账户登录QuickBi 在个人设置中配置邮箱即可。
 
 ![tool-manager](assets/quickbi账号配置可用邮箱.png)
+#### Q13:有时候在仪表版或者电子表格中对度量数值做过滤的时候，会发现有部分数据缺失？
+
+![tool-manager](assets/过滤数据缺失1.png)
+
+##### A:由于度量会做聚合统计，过滤条不是写在where后面，而是写在having后面。需要在数据集先进行过滤，或者将度量改成维度，这样过滤条件就会写在where中，不会出现数据丢失的问题。
+获取sql方法：
+![tool-manager](assets/过滤数据缺失2.png)
+查看sql逻辑：
+![tool-manager](assets/过滤数据缺失4.png)
+数据集设置过滤：
+![tool-manager](assets/在数据集过滤.png)
+重新查看sql逻辑：
+![tool-manager](assets/过滤之后就没有having了.png)
+
+
+
+
+
