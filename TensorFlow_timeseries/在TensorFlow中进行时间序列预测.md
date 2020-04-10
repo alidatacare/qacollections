@@ -1,14 +1,14 @@
-##在TensorFlow中进行时间序列预测
+## 在TensorFlow中进行时间序列预测
 
 &emsp;&emsp;常常会碰到各种各样的时间序列问题，如商场人流量的预测、商品价格的预测、股价的预测，等等。我们以TensorFlow中TensorFlow TIme Series库(简称为TFTS)为基础，它可以帮助我们在TensorFlow中快速搭建高性能的时间序列预测系统，并提供包括AR、LSTM在内的多个模型
 
-###1 时间序列问题的一般形式
+### 1 时间序列问题的一般形式
 &emsp;&emsp;一般地，时间序列数据抽象为两部分：观察的时间点和观察到的值。以商品价格为例，某年一月的价格为120元，二月的价格为130元，三月的价格为135元，四月的价格为132元。那么观察的时间点可以看作是1,2,3,4，而在各个时间点上观察到的数据的值为120,130,135,132。	<br/>
 &emsp;&emsp;观察的时间点可以不连续。比如二月的数据有缺失，那么实际的观察时间点为1,3,4，对应的数据为120,135,132。所谓时间序列预测，是指预测某些未来的时间点上（如5,6）数据的值应该是多少。<br/>
 &emsp;&emsp;TFTS库正是以按照 时间点+观察值的方式对时间序列问题进行抽象包装的。在TFTS中，观察的时间点用"times"表示，而对应的值用"values"表示。在训练模型时，输入数据需要同时具有times和values两个字段；在预测时，需要给定一些初始的数值，以及需要预测的时间点times。之后会对训练、预测的过程做进一步的介绍。
-###2 用TFTS读入时间序列数据
+### 2 用TFTS读入时间序列数据
 &emsp;&emsp;在训练模型之前，需要将时间序列数据读入成Tensor的形式。TFTS库中提供了两个方便读取器NumpyReader和CSVReader。前者用于从Numpy数组中读入数据，后者用于从CSV文件中读入数据。下面来分别介绍这两个函数。
-####2.1 从Numpy数组中读入时间序列数据
+#### 2.1 从Numpy数组中读入时间序列数据
 &emsp;&emsp;这里提供一个示例文件test_input_array.py，将演示怎么读入Numpy数组中的时间序列数据。<br/>
 &emsp;&emsp;首先导入需要的包及函数：<br/>
 	
@@ -105,7 +105,7 @@
 
 &emsp;&emsp;使用`tf.contrib.timeseries.RandomWindowInputFn`返回的train_input_fn可以进行训练了。这是在TFTS中读入Numpy数组时间序列的基本方式。下面介绍如何读入CSV格式的数据。<br/>
 
-####2.2 从CSV文件中读入时间序列数据
+#### 2.2 从CSV文件中读入时间序列数据
 &emsp;&emsp;有时，时间序列数据是存储在CSV文件中的。当然可以将其先读入为Numpy数组，再使用之前的方法处理。更方便的做法是使用`tf.contrib.timeseries.CSVReader`读入。提供了一个test_input_csv.py代码，示例如何将文件`./data/period_trend.csv`中的时间序列读入。<br/>
 
 &emsp;&emsp;假设CSV文件的时间序列数据的形式为：<br/>
@@ -160,8 +160,8 @@
 
 &emsp;&emsp;以上是TFTS库中数据的读取方式，总的来说，会从Numpy数组或者CSV文件出发构造一个reader，再利用reader生成batch数据。最后得到的Tensor为train_input_fn ，这个train_input_fn会被当作训练时的输入。<br/>
 
-###3 使用AR模型预测时间序列
-####3.1 AR模型的训练
+### 3 使用AR模型预测时间序列
+#### 3.1 AR模型的训练
 &emsp;&emsp;自回归模型(Autoregressive model,简称为AR模型)是统计学上处理时间序列模型的基本方法之一。TFTS中已经实现了一个自回归模型，对应的训练、验证并进行时间序列预测的示例程序为 train_array.py 。先仿照2.1定义一个train_input_fn：<br/>
 
 	x = np.array(range(1000))
@@ -199,7 +199,7 @@
 
 	ar.train(input_fn=train_input_fn, steps=6000)
 
-####3.2 AR模型的验证和预测
+#### 3.2 AR模型的验证和预测
 &emsp;&emsp;TFTS中验证(evaluation)的含义是：使用训练好的模型在原先训练集上进行计算，由此可以观察模型的拟合效果，对应的代码为：<br/>
 
 	evaluation_input_fn = tf.contrib.timeseries.WholeDatasetInputFn(reader)
@@ -232,9 +232,9 @@
 
 &emsp;&emsp;从图可以看出，前1000步模型原始观测值的曲线和模型拟合值非常接近，说明模型拟合得已经比较好了，1000步之后的预测也合情合理。<br/>
 
-###4 使用LSTM模型预测时间序列
+### 4 使用LSTM模型预测时间序列
 &emsp;&emsp;给出两个用LSTM预测时间序列模型的例子，分别是train_lstm.py和train_lstm_multivariate.py。前者是在LSTM中进行单变量的时间序列预测，后者是使用LSTM进行多变量时间序列预测。为了使用LSTM模型，需要先使用TFTS库对其进行定义。<br/>
-####4.1 LSTM模型中的单变量时间序列预测
+#### 4.1 LSTM模型中的单变量时间序列预测
 &emsp;&emsp;同样，用函数加噪声的方法生成一个模拟的时间序列数据：<br/>
 
 	x = np.array(range(1000))
@@ -289,7 +289,7 @@
 
 ![图片](./img/使用LSTM预测时间序列的效果.jpg "使用LSTM预测时间序列的效果")<br/>
 
-####4.2 LSTM模型中的多变量时间序列预测
+#### 4.2 LSTM模型中的多变量时间序列预测
 &emsp;&emsp;所谓多变量时间序列，是指在每个时间点上的观测值有多个值。在`data/multivariate_periods.csv`文件中保存了一个多变量时间序列的数据：<br/>
 
 	0	0.926906299771	1.99107237682	2.56546245685	3.07914768197	4.04839057867
