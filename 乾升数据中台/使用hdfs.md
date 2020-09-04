@@ -19,19 +19,21 @@
         `sbin/start-yarn.sh`
 9. 启动zkfc<br/>
        ` hadoop-daemons.sh start zkfc`
+     <br/>
    
+
 ####启动hadoop所有进程<br/>
-	`start-all.sh等价于start-dfs.sh + start-yarn.sh`
+	start-all.sh等价于start-dfs.sh + start-yarn.sh
 	
 #### 单进程启动<br/>
-	`start-dfs.sh`
-	`sbin/start-yarn.sh..`<br/>
+	start-dfs.sh
+	sbin/start-yarn.sh..
 	
 #### 常用命令 <br/>
 1. 	查看指定目录下内容<br/>
 	`hdfs dfs –ls [文件目录]`
 	`hdfs dfs -ls -R   /                   //显式目录结构`
-2.   打开某个已存在文件<br/>
+2. 打开某个已存在文件<br/>
 	`hdfs dfs –cat [file_path]`
 3. 	将本地文件存储至hadoop<br/>
 	` hdfs dfs –put [本地地址] [hadoop目录]`
@@ -43,12 +45,12 @@
 	` hdfs  dfs –rm [文件地址]`
 7.	删除hadoop上指定文件夹（包含子目录等） <br/>
 	`hdfs dfs –rm [目录地址]`
-8.  	在hadoop指定目录内创建新目录<br/>
+8.  在hadoop指定目录内创建新目录<br/>
 	`hdfs dfs –mkdir /user/t`
 9. 	在hadoop指定目录下新建一个空文件<br/>
  	使用touchz命令：<br/>
  	`hdfs dfs  -touchz  /user/new.txt` <br/>
-10. 	将hadoop上某个文件重命名 <br/>
+10. 将hadoop上某个文件重命名 <br/>
 	使用mv命令：<br/>
 	` hdfs dfs –mv  /user/test.txt  /user/ok.txt   （将test.txt重命名为ok.txt）`
 11.	将hadoop指定目录下所有内容保存为一个文件，同时down至本地 <br/>
@@ -64,7 +66,7 @@
 	NameNode在启动时会自动进入安全模式。安全模式是NameNode的一种状态，在这个阶段，文件系统不允许有任何修改。<br>
       系统显示Name node in safe mode，说明系统正处于安全模式，这时只需要等待十几秒即可，也可通过下面的命令退出安全模式：<br/>
       `hadoop dfsadmin -safemode leave`
-2.	进入安全模式<br/>
+2. 进入安全模式<br/>
 	在必要情况下，可以通过以下命令把HDFS置于安全模式:<br/>
 	`hadoop dfsadmin -safemode enter`
 	

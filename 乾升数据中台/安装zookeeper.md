@@ -37,6 +37,7 @@ ZooKeeper是一个典型的分布式数据一致性的解决方案。分布式�
 
 
 ## Zookeeper相关配置 <br/>
+
 #### zoo.cfg
 
 	maxClientCnxns=50
@@ -54,8 +55,11 @@ ZooKeeper是一个典型的分布式数据一致性的解决方案。分布式�
 	clientPort=2181
 	# the directory where the transaction logs are stored.
 	dataLogDir=/var/lib/zookeeper
+	
 <br/>
+
 #### zoo_sample.cfg
+
 	# The number of milliseconds of each tick
 	tickTime=2000
 	# The number of ticks that the initial 
@@ -81,6 +85,7 @@ ZooKeeper是一个典型的分布式数据一致性的解决方案。分布式�
 	# Purge task interval in hours
 	# Set to "0" to disable auto purge feature
 	#autopurge.purgeInterval=1
+	
 <br/>
 
 #### configuration.xsl
@@ -109,4 +114,5 @@ ZooKeeper是一个典型的分布式数据一致性的解决方案。分布式�
 	</html>
 	</xsl:template>
 	</xsl:stylesheet>
+	
 <br/>

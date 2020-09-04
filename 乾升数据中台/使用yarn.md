@@ -5,7 +5,7 @@
 	`yarn init `
 2. 	安装`package.json` 文件里定义的所有依赖<br/>
 	`yarn install `
-3.  	安装一个依赖包<br/>
+3.  安装一个依赖包<br/>
 	`yarn add  要装的包文件名`
 4. 	全局安装<br/>
 	`yarn global add 要装的包文件名 `
@@ -19,7 +19,7 @@
 	`yarn publish `
 	
 #### 初始化新项目 <br/>
-	`yarn init`
+	yarn init
 	
 #### 添加依赖包 <br/>
 	yarn add [package]
