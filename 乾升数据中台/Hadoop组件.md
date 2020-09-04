@@ -10,6 +10,7 @@
 * /dfs    :所有Hadoop存储文件 <br/>
 
 ## Hadoop相关配置 <br/>
+
 #### core-site.xml
 	
 	<?xml version="1.0" encoding="UTF-8"?>
@@ -159,7 +160,9 @@
 	</configuration>
 	
 <br/>
+
 #### hadoop-env.sh
+
 	# Prepend/Append plugin parcel classpaths
 
 	if [ "$HADOOP_USER_CLASSPATH_FIRST" = 'true' ]; then
@@ -439,6 +442,7 @@
 	</configuration>
 
 <br/>
+
 #### ssl-client.xml
 
 	<?xml version="1.0" encoding="UTF-8"?>
@@ -456,6 +460,7 @@
 	</configuration>	
 	
 <br/>
+
 #### yarn-site.xml
 
 	<?xml version="1.0" encoding="UTF-8"?>
