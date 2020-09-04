@@ -23,13 +23,16 @@
    
 
 ####启动hadoop所有进程<br/>
+
 	start-all.sh等价于start-dfs.sh + start-yarn.sh
 	
 #### 单进程启动<br/>
+
 	start-dfs.sh
 	sbin/start-yarn.sh..
 	
 #### 常用命令 <br/>
+
 1. 	查看指定目录下内容<br/>
 	`hdfs dfs –ls [文件目录]`
 	`hdfs dfs -ls -R   /                   //显式目录结构`
