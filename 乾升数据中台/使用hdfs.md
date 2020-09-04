@@ -19,8 +19,8 @@
         `sbin/start-yarn.sh`
 9. 启动zkfc<br/>
        ` hadoop-daemons.sh start zkfc`
-     <br/>
-   
+       
+<br/>   
 
 ####启动hadoop所有进程<br/>
 
