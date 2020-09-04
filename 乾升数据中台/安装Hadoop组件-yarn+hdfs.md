@@ -1,6 +1,78 @@
-# Hadoop组件
+# 安装Hadoop组件-yarn+hdfs
 
-## Hadoop安装相关文件位置及配置
+## Hadoop 3个核心组件
+* 分布式文件系统：Hdfs——实现将文件分布式存储在很多的服务器上（hdfs是一个基于Linux本地文件系统上的文件系统）
+* 分布式运算编程框架：Mapreduce——实现在很多机器上分布式并行运算
+* 分布式资源调度平台：Yarn——帮用户调度大量的mapreduce程序，并合理分配运算资源
+
+
+## HDFS的设计特点
+1. 大数据文件，非常适合上T级别的大文件或者一堆大数据文件的存储，如果文件只有几个G甚至更小就没啥意思了。
+
+2. 文件分块存储，HDFS会将一个完整的大文件平均分块存储到不同计算器上，它的意义在于读取文件时可以同时从多个主机取不同区块的文件，多主机读取比单主机读取效率要高得多得都。
+
+3. 流式数据访问，一次写入多次读写，这种模式跟传统文件不同，它不支持动态改变文件内容，而是要求让文件一次写入就不做变化，要变化也只能在文件末添加内容。
+
+4. 廉价硬件，HDFS可以应用在普通PC机上，这种机制能够让给一些公司用几十台廉价的计算机就可以撑起一个大数据集群。
+
+5. 硬件故障，HDFS认为所有计算机都可能会出问题，为了防止某个主机失效读取不到该主机的块文件，它将同一个文件块副本分配到其它某几个主机上，如果其中一台主机失效，可以迅速找另一块副本取文件。
+ 
+## HDFS的关键元素
+1. Block：将一个文件进行分块，通常是64M。
+
+2. NameNode：保存整个文件系统的目录信息、文件信息及分块信息，这是由唯一 一台主机专门保存，当然这台主机如果出错，NameNode就失效了。在 Hadoop2.* 开始支持 activity-standy 模式----如果主 NameNode 失效，启动备用主机运行 NameNode。
+
+3. DataNode：分布在廉价的计算机上，用于存储Block块文件。
+
+## HDFS运行原理
+1. NameNode和DataNode节点初始化完成后，采用RPC进行信息交换，采用的机制是心跳机制，即DataNode节点定时向NameNode反馈状态信息，反馈信息如:是否正常、磁盘空间大小、资源消耗情况等信息，以确保NameNode知道DataNode的情况；
+
+2. NameNode会将子节点的相关元数据信息缓存在内存中，对于文件与Block块的信息会通过fsImage和edits文件方式持久化在磁盘上，以确保NameNode知道文件各个块的相关信息；
+
+3. NameNode负责存储fsImage和edits元数据信息，但fsImage和edits元数据文件需要定期进行合并，这时则由SecondNameNode进程对fsImage和edits文件进行定期合并，合并好的文件再交给NameNode存储。
+![HDFS运行原理](./img/原理.jpeg)
+
+## HDFS数据合并原理
+1. NameNode初始化时会产生一个edits文件和一个fsimage文件，edits文件用于记录操作日志，比如文件的删除或添加等操作信息，fsImage用于存储文件与目录对应的信息以及edits合并进来的信息，即相当于fsimage文件在这里是一个总的元数据文件，记录着所有的信息；
+
+2. 随着edits文件不断增大，当达到设定的一个阀值的时候，这时SecondaryNameNode会将edits文件和fsImage文件通过采用http的方式进行复制到SecondaryNameNode下（在这里考虑到网络传输，所以一般将NameNode和SecondaryNameNode放在相同的节点上，这样就无需走网络带宽了，以提高运行效率），同时NameNode会产生一个新的edits文件替换掉旧的edits文件，这样以保证数据不会出现冗余；
+
+3. SecondaryNameNode拿到这两个文件后，会在内存中进行合并成一个fsImage.ckpt的文件，合并完成后，再通过http的方式将合并后的文件fsImage.ckpt复制到NameNode下，NameNode文件拿到fsImage.ckpt文件后，会将旧的fsimage文件替换掉，并且改名成fsimage文件。  <br/>
+
+通过以上几步则完成了edits和fsimage文件的合并，依此不断循环，从而到达保证元数据的正确性。
+![数据合并](./img/数据合并.jpeg)
+
+## HDFS写原理
+1. HDFS客户端提交写操作到NameNode上，NameNode收到客户端提交的请求后，会先判断此客户端在此目录下是否有写权限，如果有，然后进行查看，看哪几个DataNode适合存放，再给客户端返回存放数据块的节点信息，即告诉客户端可以把文件存放到相关的DataNode节点下；
+
+2. 客户端拿到数据存放节点位置信息后，会和对应的DataNode节点进行直接交互，进行数据写入，由于数据块具有副本replication，在数据写入时采用的方式是先写第一个副本，写完后再从第一个副本的节点将数据拷贝到其它节点，依次类推，直到所有副本都写完了，才算数据成功写入到HDFS上，副本写入采用的是串行，每个副本写的过程中都会逐级向上反馈写进度，以保证实时知道副本的写入情况；
+
+3. 随着所有副本写完后，客户端会收到数据节点反馈回来的一个成功状态，成功结束后，关闭与数据节点交互的通道，并反馈状态给NameNode,告诉NameNode文件已成功写入到对应的DataNode。
+![写流程](./img/写流程.jpeg)
+
+## HDFS读原理
+1. HDFS客户端提交读操作到NameNode上，NameNode收到客户端提交的请求后，会先判断此客户端在此目录下是否有读权限，如果有，则给客户端返回存放数据块的节点信息，即告诉客户端可以到相关的DataNode节点下去读取数据块；
+
+2. 客户端拿到块位置信息后，会去和相关的DataNode直接构建读取通道，读取数据块，当所有数据块都读取完成后关闭通道，并给NameNode返回状态信息，告诉NameNode已经读取完毕。
+![读流程](./img/读流程.jpeg)
+
+## Hadoop架构
+	node01:	192.168.1.89  
+	node02:	192.168.1.98 
+	node03:	192.168.115
+	
+	NameNode: node01  SecondaryNameNode: node02
+	Balancer: node01 HttpFS: node02
+	NFS Gateway: node02
+	DataNode:node01-node03
+## Yarn架构
+	node01:	192.168.1.89  
+	node02:	192.168.1.98 
+	node03:	192.168.115
+	ResourceManager: node01
+	JobHistory Server : node01
+	NodeManager :  node01-node03
+## Hadoop+Yarn安装相关文件位置及配置
 
 * /usr/bin/  : 所有Hadoop相关命令的软链，它们会再软链到/etc/alternatives中去
 * /var/lib/ : Hadoop服务相关数据目录
@@ -578,58 +650,6 @@
 	  </property>
 	</configuration>
 
-## Hadoop 使用常用命令<br/>
-### 基本命令
-####启动hadoop所有进程<br/>
-	`start-all.sh等价于start-dfs.sh + start-yarn.sh`
-#### 单进程启动<br/>
-	`start-dfs.sh`
-	`sbin/start-yarn.sh..`<br/>
-#### 常用命令 <br/>
-1. 	查看指定目录下内容<br/>
-	`hdfs dfs –ls [文件目录]`
-	`hdfs dfs -ls -R   /                   //显式目录结构`
-2.   打开某个已存在文件<br/>
-	`hdfs dfs –cat [file_path]`
-3. 	将本地文件存储至hadoop<br/>
-	` hdfs dfs –put [本地地址] [hadoop目录]`
-4. 	将本地文件夹存储至hadoop<br/>
-	`hdfs dfs –put [本地目录] [hadoop目录]`
-5. 	将hadoop上某个文件down至本地已有目录下<br/>
-	` hadoop dfs -get [文件目录] [本地目录]`
-6.	删除hadoop上指定文件<br/>
-	` hdfs  dfs –rm [文件地址]`
-7.	删除hadoop上指定文件夹（包含子目录等） <br/>
-	`hdfs dfs –rm [目录地址]`
-8.  	在hadoop指定目录内创建新目录<br/>
-	`hdfs dfs –mkdir /user/t`
-9. 	在hadoop指定目录下新建一个空文件<br/>
- 	使用touchz命令：<br/>
- 	`hdfs dfs  -touchz  /user/new.txt` <br/>
-10. 	将hadoop上某个文件重命名 <br/>
-	使用mv命令：<br/>
-	` hdfs dfs –mv  /user/test.txt  /user/ok.txt   （将test.txt重命名为ok.txt）`
-11.	将hadoop指定目录下所有内容保存为一个文件，同时down至本地 <br/>
-	`hdfs dfs –getmerge /user /home/t`
-12.	将正在运行的hadoop作业kill掉<br/>
-	` hadoop job –kill  [job-id]`
-13.	 查看帮助<br/>
-	` hdfs dfs -help `
-	
-#### 安全模式
-
-1. 退出安全模式<br/>
-	NameNode在启动时会自动进入安全模式。安全模式是NameNode的一种状态，在这个阶段，文件系统不允许有任何修改。<br>
-      系统显示Name node in safe mode，说明系统正处于安全模式，这时只需要等待十几秒即可，也可通过下面的命令退出安全模式：<br/>
-      `hadoop dfsadmin -safemode leave`
-2.	进入安全模式<br/>
-	在必要情况下，可以通过以下命令把HDFS置于安全模式:<br/>
-	`hadoop dfsadmin -safemode enter`
-	
-#### 负载均衡
-
-HDFS的数据在各个DataNode中的分布可能很不均匀，尤其是在DataNode节点出现故障或新增DataNode节点时。新增数据块时NameNode对DataNode节点的选择策略也有可能导致数据块分布不均匀。用户可以使用命令重新平衡DataNode上的数据块的分布：<br/>
-	`/usr/local/hadoop$bin/start-balancer.sh`
 
 	
 	

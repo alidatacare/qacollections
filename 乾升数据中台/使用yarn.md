@@ -1,33 +1,52 @@
+# 使用YARN
 
+## YARN使用常用命令<br/>
+1. 初始化包<br/>
+	`yarn init `
+2. 	安装`package.json` 文件里定义的所有依赖<br/>
+	`yarn install `
+3.  	安装一个依赖包<br/>
+	`yarn add  要装的包文件名`
+4. 	全局安装<br/>
+	`yarn global add 要装的包文件名 `
+5. 	本地跑测试<br/>
+	`yarn serve   `
+6. 	编译发布文件<br/>
+	`yarn build   `
+7. 	从当前包里移除一个未使用的包<br/>
+	`yarn remove `
+8. 	发布一个包到包管理器<br/>
+	`yarn publish `
+	
+#### 初始化新项目 <br/>
+	`yarn init`
+	
+#### 添加依赖包 <br/>
+	yarn add [package]
+	yarn add [package]@[version]
+	yarn add [package]@[tag]
+	// 举例子
+	yarn add less
+	yarn add less@2.1.2
+	yarn add less@firstjob
 
-组件    版本    发行版    CDH 版本
-centos 7
-Java 8
-mysql  5.7
-Flume NG    1.6.0   1.cdh5.12.1.p0.3    CDH 5
-MapReduce 1    2.6.0    1.cdh5.12.1.p0.3    CDH 5
-Hadoop    2.6.0+   1.cdh5.12.1.p0.3    CDH 5
-HDFS    2.6.00    1.cdh5.12.1.p0.3    CDH 5
-HttpFS    2.6.0    1.cdh5.12.1.p0.3    CDH 5
-hadoop-kms    2.6.0    1.cdh5.12.1.p0.3    CDH 5
-MapReduce 2    2.6.0    1.cdh5.12.1.p0.3    CDH 5
-YARN    2.6.0    1.cdh5.12.1.p0.3    CDH 5
-HBase    1.2.0  1.cdh5.12.1.p0.3    CDH 5
-Hive    1.1.0    1.cdh5.12.1.p0.3    CDH 5
-HCatalog    1.1.0    1.cdh5.12.1.p0.3    CDH 5
-Hue    3.9.0   1.cdh5.12.1.p0.3    CDH 5
-Impala    2.9.0   1.cdh5.12.1.p0.3    CDH 5
-Mahout    0.9    1.cdh5.12.1.p0.3    CDH 5
-Oozie    4.1.0   1.cdh5.12.1.p0.3    CDH 5
-spark    1.6.0    1.cdh5.12.1.p0.3    CDH 5
-Sqoop    1.99.5    1.cdh5.12.1.p0.3    CDH 5
-Sqoop2    1.4.6    1.cdh5.12.1.p0.3    CDH 5
-ZooKeeper    3.4.5   1.cdh5.12.1.p0.3    CDH 5
-Cloudera Manager Management Daemon    5.12.1    1.cm5121.p0.6   
-Cloudera Manager Agent    5.12.1    1.cm5121.p0.6.el7  
-elasticsearch-6.2.4
-kafka 2.1.2
- 
+#### 将依赖项添加到不同依赖项类别
+分别添加到 devDependencies、peerDependencies 和 optionalDependencies：<br/>
 
+	yarn add [package] --dev
+	yarn add [package] --peer
+	yarn add [package] --optional
+	
+#### 升级依赖包
 
+	yarn upgrade [package]
+	yarn upgrade [package]@[version]
+	yarn upgrade [package]@[tag]
+	
+#### 移除依赖包
 
+	yarn remove [package]
+
+#### 安装项目的全部依赖
+
+	yarn 或  yarn install	
