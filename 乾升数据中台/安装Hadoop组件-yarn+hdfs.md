@@ -229,8 +229,11 @@
 	    <final>true</final>
 	  </property>
 	</configuration>
+
 <br/>
+
 #### hadoop-env.sh
+
 	# Prepend/Append plugin parcel classpaths
 
 	if [ "$HADOOP_USER_CLASSPATH_FIRST" = 'true' ]; then
@@ -319,6 +322,7 @@
 	    <value>true</value>
 	  </property>
 	</configuration>
+	
 <br/>
 
 #### mapred-site.xml
@@ -508,7 +512,9 @@
 	    <value>false</value>
 	  </property>
 	</configuration>
+
 <br/>
+
 #### ssl-client.xml
 
 	<?xml version="1.0" encoding="UTF-8"?>
@@ -524,6 +530,7 @@
 	    <value>10000</value>
 	  </property>
 	</configuration>	
+	
 <br/>
 
 #### yarn-site.xml
